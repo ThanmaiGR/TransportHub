@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<!--        <link rel="stylesheet" href="{% static 'css/materialize.min.css' %}">-->
+<!--        <script src="{% static 'js/materialize.min.js' %}"></script>-->
+
+<!--    <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>-->
+
+
+</head>
+<body>
+  <nav>
+    <div class="nav-wrapper" style="background-color:#2D2E3E">
+      <a href="{% url 'core:home' %}" class="brand-logo">Logo</a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+          {% include 'core/includes/navbaritems.html' %}
+      </ul>
+    </div>
+  </nav>
+    {% include 'core/includes/messaging.html' %}
+
+  <div class="container">
+    {% block content %}
+    {% endblock %}
+  </div>
+</body>
+<!--<script type="text/javascript" src="js/materialize.min.js"></script>-->
+
+
+</html>

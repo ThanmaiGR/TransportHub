@@ -1,0 +1,8 @@
+        <li><a href="{% url 'core:home' %}">Home</a></li>
+        {% if user.is_authenticated %}
+             <li><a href="{% url 'users:account' %}">{{user.username|title}}</a></li>
+             <li><a href="{% url 'users:logout' %}">Logout</a></li>
+        {% else %}
+            <li><a href="{% url 'users:login' %}">Login</a></li>
+            <li><a href="{% url 'users:register' %}">Register</a></li>
+        {% endif %}

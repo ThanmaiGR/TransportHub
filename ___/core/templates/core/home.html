@@ -1,0 +1,64 @@
+{% extends 'core/header.html' %}
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">-->
+
+
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+</head>
+<body>
+    {% block content %}
+    <div class="col s12 m7">
+    <h2 class="header">Find Your Transport</h2>
+    <div class="card horizontal">
+      <div class="card-image">
+        <img src="{% static 'images/transport.jfif' %} ">
+      </div>
+      <div class="card-stacked">
+        <div class="card-content">
+          <p>Our Application has One Goal</p>
+          <p>We aim to provide you with the best Transport options available for your specific needs</p>
+          <p>To use our app, Please click the hyperlink below</p>
+        </div>
+        <div class="card-action">
+          <a href="{% url 'core:main' %}">Proceed</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+ <div class="col s12 m7">
+    <h2 class="header">Perks of being a Member</h2>
+    <div class="card horizontal">
+      <div class="card-image">
+        <img src="{% static 'images/member.jfif' %} ">
+      </div>
+      <div class="card-stacked">
+        <div class="card-content">
+          <p>A membership allows you to specify your constraints better than a non-member</p>
+          <p>Being a member implies that the application works better as it is catered to <strong>your needs</strong></p>
+          <p>Join us Today at <b>0</b> cost and enjoy your perks</p>
+        </div>
+        <div class="card-action">
+          <a href="{% url 'users:register' %}">Sign UP</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+    {% endblock %}
+</body>
+<script type="text/javascript" src="js/materialize.min.js"></script>
+<!--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>-->

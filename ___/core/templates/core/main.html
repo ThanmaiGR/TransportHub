@@ -1,0 +1,32 @@
+{% extends 'core/header.html' %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% block content %}
+    <form>
+        <label for="source"><b>Source</b></label>
+        <select name="source" id="source" style="display: block;">
+            <option value="" disabled>Choose your Option</option>
+
+            {% for each in src %}
+            <option value={{each}}>{{each}}</option>
+            {% endfor %}
+        </select>
+
+        <label for="destination"><b>Destination</b></label>
+        <select name="destination" id="destination" style="display: block;">
+            <option value="" disabled>Choose your Option</option>
+
+            {% for each in dest %}
+            <option value={{each}}>{{each}}</option>
+            {% endfor %}
+        </select>
+
+        Departure Time<input type="datetime-local" name="time" id="time"/>
+    </form>
+{% endblock %}
+</body>
+</html>

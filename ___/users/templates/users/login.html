@@ -1,0 +1,15 @@
+{% extends 'users/header.html' %}
+
+{% block content %}
+    <div class="container">
+        <fieldset>
+            <legend>LogIn</legend>
+        <form method="POST">
+        {% csrf_token %}
+        {{form.as_p}}
+            <button style="background-color:#F4EB16; color:blue" class="btn btn-outline-info" type="submit">Login</button>
+        </form>
+        Don't have an account? <a href="{% url 'users:register' %}" target="_self"><strong>register here</strong></a>!
+        </fieldset>
+    </div>
+{% endblock %}

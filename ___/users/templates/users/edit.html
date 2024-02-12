@@ -1,0 +1,11 @@
+{% extends 'users/header.html' %}
+<body>
+    {% block content %}
+        <form method="POST">
+        {% csrf_token %}
+        Username<input type="text" name="ausername" value="{{user.username}}" disabled/><br><br>
+        Email<input type="email" name="aemail" value="{{user.email}}" /><br><br>
+        <button type="submit">Submit</button>
+        </form>
+    {% endblock %}
+</body>
