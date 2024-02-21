@@ -3,6 +3,8 @@
     {% block content %}
         <form method="POST">
         {% csrf_token %}
+        First Name<input type="text" name="afirst" value="{{user.first_name}}" ><br><br>
+        Last Name<input type="text" name="alast" value="{{user.last_name}}" ><br><br>
         Username<input type="text" name="ausername" value="{{user.username}}" disabled/><br><br>
         Email<input type="email" name="aemail" value="{{user.email}}" /><br><br>
         <button type="submit">Submit</button>

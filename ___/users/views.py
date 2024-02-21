@@ -75,16 +75,30 @@ def account(request):
 def edit(request):
     if request.method == "POST":
         email = request.POST.get('aemail')
+        fname = request.POST.get('afirst')
+        lname = request.POST.get('alast')
+        if (fname == '') and (lname != ''):
+            messages.error(request, "First name cannot be blank with Last Name")
+            return render(request=request,
+                          template_name="users/edit.html",
+                          context={})
         user = None
         try:
             user = get_object_or_404(User, email=email)
             if user is not None:
                 if user == request.user:
-                    messages.error(request, "New Email Cannot be Same as Old Email")
+                    request.user.email = email
+                    request.user.first_name = fname
+                    request.user.last_name = lname
+                    request.user.save()
+                    messages.success(request, "Profile updated")
+                    return redirect("core:home")
                 else:
                     messages.error(request, "Email Already Exists")
         except Exception:
             request.user.email = email
+            request.user.first_name = fname
+            request.user.last_name = lname
             request.user.save()
             messages.success(request, "Email Successfully Changed")
             return redirect("core:home")
@@ -92,3 +106,6 @@ def edit(request):
         return render(request=request,
                       template_name="users/edit.html",
                       context={})
+    else:
+        messages.error(request, 'Please login to view account details')
+        return redirect("users:login")

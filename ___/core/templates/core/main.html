@@ -3,30 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="shortcut icon" href="#" />
 </head>
 <body>
 {% block content %}
-    <form>
-        <label for="source"><b>Source</b></label>
-        <select name="source" id="source" style="display: block;">
-            <option value="" disabled>Choose your Option</option>
+    <fieldset>
+        <legend><strong>Find Your Transport</strong></legend>
+        <form method="POST">
+            {% csrf_token %}
+            <label for="source"><b>Source</b></label>
+            <select name="source" id="source" style="display: block;" required>
+                <option value="" disabled selected hidden>Choose your Option</option>
+                {% for each in locations %}
+                <option value="{{each}}">{{each}}</option>
+                {% endfor %}
+            </select>
 
-            {% for each in src %}
-            <option value={{each}}>{{each}}</option>
-            {% endfor %}
-        </select>
+            <label for="destination"><b>Destination</b></label>
+            <select name="destination" id="destination" style="display: block;" required>
+                <option value="" disabled selected hidden>Choose your Option</option>
 
-        <label for="destination"><b>Destination</b></label>
-        <select name="destination" id="destination" style="display: block;">
-            <option value="" disabled>Choose your Option</option>
+                {% for each in locations %}
+                <option value="{{each}}">{{each}}</option>
+                {% endfor %}
+            </select>
+            <label for="time"><b>Departure Time</b></label>
+            <input type="datetime-local" name="time" id="time" required/>
 
-            {% for each in dest %}
-            <option value={{each}}>{{each}}</option>
-            {% endfor %}
-        </select>
+            {% if user.is_authenticated %}
+            <div>
+                <label for="pretime"><b> Preferred Journey Duration</b></label>
+                <input type="time" name="pretime" id="pretime" placeholder="--:--"/>
+                <label for="prefare"><b> Preferred Journey Fare</b></label>
+                <input type="number" name="prefare" id="prefare" placeholder="00.00"/>
+            </div>
+            {% else %}
+            <p><b>Login to customize preferences</b></p>
+            <div style="background-color:#04F9D2">
+                <label for="pretime"><b> Preferred Journey Duration</b></label>
+                <input type="time" name="pretime" id="pretime" placeholder="--:--" disabled/>
+                <label for="prefare"><b> Preferred Journey Fare</b></label>
+                <input type="number" name="prefare" id="prefare" placeholder="00.00" disabled/>
+            </div>
+            {% endif %}
+            <br>
+            <button type="submit" style="background-color:#2D2E3E; color:white"
+                    class="btn btn-outline-info">Submit</button>
+        </form>
+    </fieldset>
 
-        Departure Time<input type="datetime-local" name="time" id="time"/>
-    </form>
 {% endblock %}
 </body>
 </html>

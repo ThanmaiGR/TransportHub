@@ -48,7 +48,11 @@
           <p>Join us Today at <b>0</b> cost and enjoy your perks</p>
         </div>
         <div class="card-action">
-          <a href="{% url 'users:register' %}">Sign UP</a>
+            {% if user.is_authenticated %}
+            <p><strong>You are already a member</strong></p>
+            {% else %}
+                <a href="{% url 'users:register' %}">Sign UP</a>
+            {% endif %}
         </div>
       </div>
     </div>
