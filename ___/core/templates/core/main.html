@@ -5,7 +5,16 @@
     <title>Title</title>
     <link rel="shortcut icon" href="#" />
 </head>
+<!--<style>-->
+<!--    input{-->
+<!--    display: block;-->
+<!--    visibility: visible;-->
+<!--    border-color:red;-->
+<!--    background-color:Gray;-->
+<!--    }-->
+<!--</style>-->
 <body>
+
 {% block content %}
     <fieldset>
         <legend><strong>Find Your Transport</strong></legend>
@@ -32,18 +41,24 @@
 
             {% if user.is_authenticated %}
             <div>
-                <label for="pretime"><b> Preferred Journey Duration</b></label>
-                <input type="time" name="pretime" id="pretime" placeholder="--:--"/>
-                <label for="prefare"><b> Preferred Journey Fare</b></label>
-                <input type="number" name="prefare" id="prefare" placeholder="00.00"/>
+                <input type="radio" id="Fare_Preferred" name="Choice" value="Fare" style="opacity:1; pointer-events:auto; position:static">
+                <label for="Fare_Preferred">Fare</label><br>
+                <input type="radio" id="Time_Preferred" name="Choice" value="Time" style="opacity:1; pointer-events:auto; position:static">
+                <label for="Time_Preferred">Time</label><br>
+                <input type="radio" id="Both_Preferred" name="Choice" value="Time" checked="checked" style="opacity:1; pointer-events:auto; position:static">
+                <label for="Both_Preferred">Both</label><br>
+
             </div>
             {% else %}
             <p><b>Login to customize preferences</b></p>
-            <div style="background-color:#04F9D2">
-                <label for="pretime"><b> Preferred Journey Duration</b></label>
-                <input type="time" name="pretime" id="pretime" placeholder="--:--" disabled/>
-                <label for="prefare"><b> Preferred Journey Fare</b></label>
-                <input type="number" name="prefare" id="prefare" placeholder="00.00" disabled/>
+            <div>
+                <input type="radio" id="Fare_Preferred" name="Choice" value="Fare" style="opacity:1; pointer-events:auto; position:static" disabled>
+                <label for="Fare_Preferred">Fare</label><br>
+                <input type="radio" id="Time_Preferred" name="Choice" value="Time" style="opacity:1; pointer-events:auto; position:static" disabled>
+                <label for="Time_Preferred">Time</label><br>
+                <input type="radio" id="Both_Preferred" name="Choice" value="Time" checked="checked" disabled style="opacity:1; pointer-events:auto; position:static">
+                <label for="Both_Preferred">Both</label><br>
+
             </div>
             {% endif %}
             <br>

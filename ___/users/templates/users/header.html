@@ -16,7 +16,8 @@
 <body>
   <nav>
     <div class="nav-wrapper" style="background-color:#2D2E3E">
-      <a href="{% url 'core:home' %}" class="brand-logo">Logo</a>
+      <a href="{% url 'core:home' %}" class="brand-logo"><img src="{% static 'images/train_logo.png' %}"
+      style="width:65px;height:65px"/></a>
       <ul id="nav-mobile" class="right hide-on-med-and-down">
           {% include 'users/includes/navbaritems.html' %}
       </ul>

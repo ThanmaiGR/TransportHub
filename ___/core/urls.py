@@ -7,5 +7,6 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("main", views.main, name="main"),
     path("path", views.path, name="path"),
+    # path('path/<int:source>/<int:destination>', views.path, name='path'),
 
 ]

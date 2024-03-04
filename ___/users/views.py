@@ -7,7 +7,6 @@ from .forms import NewUserForm
 from django.contrib.auth.models import User
 
 
-# Create your views here.
 def register(request):
     if request.method == "POST":
         form = NewUserForm(request.POST)
@@ -17,24 +16,28 @@ def register(request):
             messages.success(request, f"New account created: {username}")
             login(request, user)
             return redirect("core:home")
-
         else:
-            for msg in form.error_messages:
-                messages.error(request, f"{msg}: {form.error_messages[msg]}")
-
+            for field, errors in form.errors.items():
+                for error in errors:
+                    if field == 'password2':
+                        messages.error(request, f"Confirm Password: {error}")
+                    else:
+                        messages.error(request, f"{field}: {error}")
             return render(request=request,
                           template_name="users/register.html",
                           context={"form": form})
-
     form = NewUserForm()
-    return render(request=request,
-                  template_name="users/register.html",
-                  context={"form": form})
+    return render(
+        request=request,
+        template_name="users/register.html",
+        context={"form": form}
+    )
 
 
 def logout_request(request):
-    logout(request)
-    messages.info(request, "Logged out successfully!")
+    if request.user.is_authenticated:
+        logout(request)
+        messages.info(request, "Logged out successfully!")
     return redirect("core:home")
 
 
@@ -54,9 +57,11 @@ def login_request(request):
         else:
             messages.error(request, "Invalid username or password.")
     form = AuthenticationForm()
-    return render(request=request,
-                  template_name="users/login.html",
-                  context={"form": form})
+    return render(
+        request=request,
+        template_name="users/login.html",
+        context={"form": form}
+    )
 
 
 def account(request):
@@ -64,9 +69,11 @@ def account(request):
         return redirect("users:edit")
 
     if request.user.is_authenticated:
-        return render(request=request,
-                      template_name="users/account.html",
-                      context={})
+        return render(
+            request=request,
+            template_name="users/account.html",
+            context={}
+        )
     else:
         messages.error(request, 'Please login to view account details')
         return redirect("users:login")
@@ -79,9 +86,11 @@ def edit(request):
         lname = request.POST.get('alast')
         if (fname == '') and (lname != ''):
             messages.error(request, "First name cannot be blank with Last Name")
-            return render(request=request,
-                          template_name="users/edit.html",
-                          context={})
+            return render(
+                request=request,
+                template_name="users/edit.html",
+                context={}
+            )
         user = None
         try:
             user = get_object_or_404(User, email=email)
@@ -103,9 +112,11 @@ def edit(request):
             messages.success(request, "Email Successfully Changed")
             return redirect("core:home")
     if request.user.is_authenticated:
-        return render(request=request,
-                      template_name="users/edit.html",
-                      context={})
+        return render(
+            request=request,
+            template_name="users/edit.html",
+            context={}
+        )
     else:
         messages.error(request, 'Please login to view account details')
         return redirect("users:login")
