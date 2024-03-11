@@ -5,18 +5,21 @@
     <title>Title</title>
     <link rel="shortcut icon" href="#" />
 </head>
-<!--<style>-->
-<!--    input{-->
-<!--    display: block;-->
-<!--    visibility: visible;-->
-<!--    border-color:red;-->
-<!--    background-color:Gray;-->
-<!--    }-->
-<!--</style>-->
+<style>
+    fieldset{
+        width:50vw;
+    }
+    .container{
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+    }
+</style>
 <body>
 
 {% block content %}
-    <fieldset>
+    <fieldset class="flex justify-center align-item">
         <legend><strong>Find Your Transport</strong></legend>
         <form method="POST">
             {% csrf_token %}

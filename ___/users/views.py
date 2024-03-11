@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect, reverse, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.shortcuts import render, redirect, reverse
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout, authenticate, login
 from django.contrib import messages
 from .forms import NewUserForm
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def register(request):
@@ -38,7 +38,7 @@ def logout_request(request):
     if request.user.is_authenticated:
         logout(request)
         messages.info(request, "Logged out successfully!")
-    return redirect("core:home")
+    return redirect(reverse("core:home"))
 
 
 def login_request(request):
@@ -81,33 +81,32 @@ def account(request):
 
 def edit(request):
     if request.method == "POST":
-        email = request.POST.get('aemail')
-        fname = request.POST.get('afirst')
-        lname = request.POST.get('alast')
-        if (fname == '') and (lname != ''):
+        email = request.POST.get('acc_email')
+        first_name = request.POST.get('acc_first')
+        last_name = request.POST.get('acc_last')
+        if (first_name == '') and (last_name != ''):
             messages.error(request, "First name cannot be blank with Last Name")
             return render(
                 request=request,
                 template_name="users/edit.html",
                 context={}
             )
-        user = None
         try:
-            user = get_object_or_404(User, email=email)
+            user = User.objects.get(email=email)
             if user is not None:
                 if user == request.user:
                     request.user.email = email
-                    request.user.first_name = fname
-                    request.user.last_name = lname
+                    request.user.first_name = first_name
+                    request.user.last_name = last_name
                     request.user.save()
                     messages.success(request, "Profile updated")
                     return redirect("core:home")
                 else:
                     messages.error(request, "Email Already Exists")
-        except Exception:
+        except ObjectDoesNotExist:
             request.user.email = email
-            request.user.first_name = fname
-            request.user.last_name = lname
+            request.user.first_name = first_name
+            request.user.last_name = last_name
             request.user.save()
             messages.success(request, "Email Successfully Changed")
             return redirect("core:home")

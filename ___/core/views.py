@@ -1,19 +1,14 @@
 import os
 import datetime
-from .Functions import find_path, go_from_source_to_destination, str_to_time
-from django.shortcuts import render, redirect, reverse, get_object_or_404
-from .models import Locations, Connections
+from .Functions import find_path, go_from_source_to_destination, str_to_time, Graph
+from django.shortcuts import render, redirect, reverse
+from .models import Locations
 from django.contrib import messages
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from django.http import HttpResponse, HttpResponseRedirect
-from .testcalc import Graph
 import numpy as np
 import cv2
 import pyautogui
-
-
-# Create your views here.
 
 
 def home(request):
@@ -80,9 +75,7 @@ def path(request):
     if path_taken:
         time_taken = str_to_time(total_time)
         actual_path = find_path(source, destination, path_taken)
-        print("Reverse Path found")
         actual_path = go_from_source_to_destination(destination, source, actual_path)
-        print("Actual Path Found")
         del request.session['source']
         del request.session['destination']
 
