@@ -1,8 +1,8 @@
 import os
 import datetime
-from .Functions import find_path, go_from_source_to_destination, str_to_time, Graph
+from .functions import find_path, go_from_source_to_destination, str_to_time, Graph
 from django.shortcuts import render, redirect, reverse
-from .models import Locations
+from .models import Locations, Routes
 from django.contrib import messages
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -35,7 +35,7 @@ def main(request):
             choice = 'Both'
         if source == destination:
             messages.error(request, 'Source and Destination Cannot be Same')
-        elif time.replace(tzinfo=datetime.timezone.utc) < timezone.now().replace(tzinfo=datetime.timezone.utc):
+        elif time.astimezone(datetime.timezone.utc) < timezone.now().replace(tzinfo=datetime.timezone.utc):
             messages.error(request, 'Please Enter a Valid Time')
         else:
             request.session['source'] = source
@@ -60,7 +60,7 @@ def path(request):
             cv2.COLOR_RGB2BGR
         )
         downloads_folder = os.path.join(os.getenv('USERPROFILE'), 'Downloads')
-        cv2.imwrite(os.path.join(downloads_folder, "image1.png"), image)
+        cv2.imwrite(os.path.join(downloads_folder, "transport_routes.png"), image)
 
         return redirect(reverse('core:home'))
     source = request.session.get('source')
@@ -80,13 +80,17 @@ def path(request):
         del request.session['destination']
 
         for idx, row in enumerate(actual_path):
-            start_id, stop_id, part_time = row[0], row[1], row[4]
+            start_id, stop_id, route_id, part_time = row[0], row[1], row[2], row[4]
             row[0] = Locations.objects.filter(LocationID=start_id).values_list(
                 'LocationName',
                 flat=True
             ).first()
             row[1] = Locations.objects.filter(LocationID=stop_id).values_list(
                 'LocationName',
+                flat=True
+            ).first()
+            row[2] = Routes.objects.filter(RouteID=route_id).values_list(
+                'RouteName',
                 flat=True
             ).first()
             row[4] = str_to_time(part_time)

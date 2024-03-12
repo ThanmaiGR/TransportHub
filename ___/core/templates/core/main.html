@@ -1,75 +1,68 @@
 {% extends 'core/header.html' %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="shortcut icon" href="#" />
-</head>
 <style>
-    fieldset{
-        width:50vw;
-    }
     .container{
         display:flex;
         justify-content:center;
         align-items:center;
         height:100vh;
+        text-align: center;
     }
 </style>
-<body>
+<body style="min-height: 100vh;min-width: 100vw;">
 
 {% block content %}
-    <fieldset class="flex justify-center align-item">
-        <legend><strong>Find Your Transport</strong></legend>
-        <form method="POST">
-            {% csrf_token %}
-            <label for="source"><b>Source</b></label>
-            <select name="source" id="source" style="display: block;" required>
-                <option value="" disabled selected hidden>Choose your Option</option>
-                {% for each in locations %}
-                <option value="{{each}}">{{each}}</option>
-                {% endfor %}
-            </select>
+    <div class="container" style="margin-top:90px;">
+        <fieldset>
+            <legend><strong>Find Your Transport</strong></legend>
+            <form method="POST">
+                {% csrf_token %}
+                <label for="source"><b>Source</b></label>
+                <select name="source" id="source" style="display: block;" required>
+                    <option value="" disabled selected hidden>Choose your Option</option>
+                    {% for each in locations %}
+                    <option value="{{each}}">{{each}}</option>
+                    {% endfor %}
+                </select>
 
-            <label for="destination"><b>Destination</b></label>
-            <select name="destination" id="destination" style="display: block;" required>
-                <option value="" disabled selected hidden>Choose your Option</option>
+                <label for="destination"><b>Destination</b></label>
+                <select name="destination" id="destination" style="display: block;" required>
+                    <option value="" disabled selected hidden>Choose your Option</option>
 
-                {% for each in locations %}
-                <option value="{{each}}">{{each}}</option>
-                {% endfor %}
-            </select>
-            <label for="time"><b>Departure Time</b></label>
-            <input type="datetime-local" name="time" id="time" required/>
+                    {% for each in locations %}
+                    <option value="{{each}}">{{each}}</option>
+                    {% endfor %}
+                </select>
+                <label for="time"><b>Departure Time</b></label>
+                <input type="datetime-local" name="time" id="time" required/>
 
-            {% if user.is_authenticated %}
-            <div>
-                <input type="radio" id="Fare_Preferred" name="Choice" value="Fare" style="opacity:1; pointer-events:auto; position:static">
-                <label for="Fare_Preferred">Fare</label><br>
-                <input type="radio" id="Time_Preferred" name="Choice" value="Time" style="opacity:1; pointer-events:auto; position:static">
-                <label for="Time_Preferred">Time</label><br>
-                <input type="radio" id="Both_Preferred" name="Choice" value="Time" checked="checked" style="opacity:1; pointer-events:auto; position:static">
-                <label for="Both_Preferred">Both</label><br>
+                {% if user.is_authenticated %}
+                <div>
+                    <input type="radio" id="Fare_Preferred" name="Choice" value="Fare" style="opacity:1; pointer-events:auto; position:static">
+                    <label for="Fare_Preferred">Fare</label><br>
+                    <input type="radio" id="Time_Preferred" name="Choice" value="Time" style="opacity:1; pointer-events:auto; position:static">
+                    <label for="Time_Preferred">Time</label><br>
+                    <input type="radio" id="Both_Preferred" name="Choice" value="Time" checked="checked" style="opacity:1; pointer-events:auto; position:static">
+                    <label for="Both_Preferred">Both</label><br>
 
-            </div>
-            {% else %}
-            <p><b>Login to customize preferences</b></p>
-            <div>
-                <input type="radio" id="Fare_Preferred" name="Choice" value="Fare" style="opacity:1; pointer-events:auto; position:static" disabled>
-                <label for="Fare_Preferred">Fare</label><br>
-                <input type="radio" id="Time_Preferred" name="Choice" value="Time" style="opacity:1; pointer-events:auto; position:static" disabled>
-                <label for="Time_Preferred">Time</label><br>
-                <input type="radio" id="Both_Preferred" name="Choice" value="Time" checked="checked" disabled style="opacity:1; pointer-events:auto; position:static">
-                <label for="Both_Preferred">Both</label><br>
+                </div>
+                {% else %}
+                <p><b>Login to customize preferences</b></p>
+                <div>
+                    <input type="radio" id="Fare_Preferred" name="Choice" value="Fare" style="opacity:1; pointer-events:auto; position:static" disabled>
+                    <label for="Fare_Preferred">Fare</label><br>
+                    <input type="radio" id="Time_Preferred" name="Choice" value="Time" style="opacity:1; pointer-events:auto; position:static" disabled>
+                    <label for="Time_Preferred">Time</label><br>
+                    <input type="radio" id="Both_Preferred" name="Choice" value="Time" checked="checked" disabled style="opacity:1; pointer-events:auto; position:static">
+                    <label for="Both_Preferred">Both</label><br>
 
-            </div>
-            {% endif %}
-            <br>
-            <button type="submit" style="background-color:#2D2E3E; color:white"
-                    class="btn btn-outline-info">Submit</button>
-        </form>
-    </fieldset>
-
+                </div>
+                {% endif %}
+                <br>
+                <button type="submit" style="background-color:#2D2E3E; color:white"
+                        class="btn btn-outline-info">Submit</button>
+            </form>
+        </fieldset>
+    </div>
 {% endblock %}
 </body>
 </html>

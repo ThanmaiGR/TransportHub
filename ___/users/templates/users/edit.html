@@ -1,13 +1,20 @@
 {% extends 'users/header.html' %}
 <body>
     {% block content %}
+    <div class="container" style="margin-top:90px;">
+    <fieldset>
+        <legend style="font-size:25px">Profile</legend>
         <form method="POST">
         {% csrf_token %}
         First Name<input type="text" name="acc_first" value="{{user.first_name}}" ><br><br>
         Last Name<input type="text" name="acc_last" value="{{user.last_name}}" ><br><br>
         Username<input type="text" name="acc_username" value="{{user.username}}" disabled/><br><br>
         Email<input type="email" name="acc_email" value="{{user.email}}" /><br><br>
-        <button type="submit">Submit</button>
+        <button type="submit"
+                class="btn btn-outline-info btn-rounded"
+                style="background-color: #2D2E3E">Submit</button>
         </form>
+    </fieldset>
+    </div>
     {% endblock %}
 </body>

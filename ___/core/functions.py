@@ -8,8 +8,9 @@ from .models import Locations, Connections, RouteDetails, CabCompanies, CabFareS
 
 def str_to_time(time):
     """
-    :param time: Time in hours
-    :return: Time of form H:MM
+    Converts a time represented as a string to the format H:MM.
+    :param time: A string representing time in hours.
+    :return: A string representing time in the format H:MM.
     """
     hours = int(time)
     minutes = (time * 60) % 60
@@ -21,11 +22,14 @@ def str_to_time(time):
 
 def find_path(source, destination, path):
     """
-    :param source: source node
-    :param destination: destination node
-    :param path: dictionary containing info of next nodes for each node
-    :return: route from destination to source
+    Returns the route from the destination node to the source node based on the provided path dictionary.
+
+    :param source: The source node.
+    :param destination: The destination node.
+    :param path: A dictionary containing information about the next nodes for each node.
+    :return: The route from the destination to the source node.
     """
+
     path_dict = {}
     current_stop = destination
 
@@ -57,11 +61,15 @@ def find_path(source, destination, path):
 
 def go_from_source_to_destination(source, destination, path):
     """
-    :param source: source node
-    :param destination: destination node
-    :param path: dictionary that can be used to traverse from destination to source
-    :return: route from source to destination
+    Returns the route from the source node to the destination node using the provided path dictionary.
+
+    :param source: The source node.
+    :param destination: The destination node.
+    :param path: A dictionary containing information that can be used to traverse from the destination node to the
+    source node.
+    :return: The route from the source node to the destination node.
     """
+
     current_stop = source
     route = []
 
@@ -88,9 +96,12 @@ def go_from_source_to_destination(source, destination, path):
 
 def generate_traffic(current_time=None):
     """
-    :param current_time: time at which traffic factor is to be generated
-    :return: traffic factor
+    Generates a traffic factor based on the given current time.
+
+    :param current_time: The time at which the traffic factor is to be generated.
+    :return: The traffic factor calculated for the given time.
     """
+
     if current_time is None:
         current_time = datetime.datetime.now()
 
@@ -169,7 +180,41 @@ def generate_traffic(current_time=None):
 
 
 class Graph:
+    """
+    Represents a graph for modeling transportation networks.
+
+    Attributes:
+        adjacency_list (dict): A dictionary representing the adjacency list of the graph.
+        cost_list (dict): A dictionary containing the cost (e.g., fare) for traveling between nodes.
+        traffic (dict): A dictionary containing traffic information for each edge.
+        speed (dict): A dictionary containing the speed of different transportation modes.
+
+    Methods:
+        __init__(self, time): Initializes the Graph object with given time information.
+        add_traffic(self, time): Calculates the traffic factor for each edge based on the given time.
+        add_location(self, location_id): Creates an adjacency list of all edges connected to the given location.
+        add_cost_and_factor(self, source_id, destination_id, distance): Calculates cost and traffic factor for edges.
+        calculate_best_path(self, source, destination, main_factor="Both"): Calculates the best path between
+            source and destination nodes based on a specified factor.
+        find_cabs(self, source, destination): Calculates the total fare and time taken by each cab to travel from
+            source node to destination node.
+        calculate_cab_distance(self, source, destination): Calculates the total distance and time taken by a cab to
+            reach the destination from the source node.
+    """
+
     def __init__(self, time):
+        """
+        Initializes a Graph object with the provided time.
+
+        This method sets up the graph by:
+        - Initializing the adjacency list, cost list, and traffic dictionaries.
+        - Retrieving locations and adding them to the adjacency list.
+        - Setting up the speed dictionary for different transportation modes.
+        - Adding traffic information based on the provided time.
+        - Adding cost and traffic factor for each edge.
+
+        :param time: The time at which the graph is initialized, used for calculating traffic.
+        """
         self.adjacency_list = {}
         self.cost_list = {}
         self.traffic = {}
@@ -191,10 +236,12 @@ class Graph:
 
     def add_traffic(self, time):
         """
-        Calculate Traffic factor for each edge
-        :param time: Time at which travel takes place
+        Calculates the traffic factor for each edge based on the given time.
+
+        :param time: The time at which the travel takes place.
         :return: None
         """
+
         for key, value in self.adjacency_list.items():
             for node in value:
                 traffic_factor = generate_traffic(time)
@@ -204,10 +251,12 @@ class Graph:
 
     def add_location(self, location_id):
         """
-        Create Adjacency list of all edges
-        :param location_id: Location_id of a location
+        Creates an adjacency list of all edges connected to the given location_id.
+
+        :param location_id: The location_id of a location.
         :return: None
         """
+
         self.adjacency_list[location_id] = []
         self.adjacency_list[location_id].extend([
             (connection.DestinationID_id, connection.Distance)
@@ -216,10 +265,11 @@ class Graph:
 
     def add_cost_and_factor(self, source_id, destination_id, distance):
         """
-        Find all paths to neighbour node along with route number, fare and time taken to reach the neighbour
-        :param source_id: current node
-        :param destination_id: neighbour node
-        :param distance: distance between source and destination
+        Finds all paths to a neighbor node along with route number, fare, and time taken to reach the neighbor.
+
+        :param source_id: The current node.
+        :param destination_id: The neighbor node.
+        :param distance: The distance between the source and destination.
         :return: None
         """
 
@@ -252,12 +302,14 @@ class Graph:
 
     def calculate_best_path(self, source, destination, main_factor="Both"):
         """
-        Calculate Best Path between source and destination using some factor
-        :param source: Start node
-        :param destination: Destination node
-        :param main_factor: Calculate based on Fare, Time or Both
-        :return: total fare, total time and path between source and destination
+        Calculates the best path between the source and destination nodes based on a specified factor.
+
+        :param source: The starting node.
+        :param destination: The destination node.
+        :param main_factor: The factor to use for calculation, such as fare, time, or a combination of both.
+        :return: A tuple containing the total fare, total time, and the path between the source and destination nodes.
         """
+
         factors = {
             "Fare": 1,
             "Time": 2,
@@ -316,10 +368,14 @@ class Graph:
 
     def find_cabs(self, source, destination):
         """
-        :param source: source node
-        :param destination: destination node
-        :return: total fare and time taken by each cab to go from source to destination
+        Calculates the total fare and time taken by each cab to travel from the source node to the destination node.
+
+        :param source: The source node.
+        :param destination: The destination node.
+        :return: A dictionary containing the total fare and time taken by each cab to go from the source to the
+        destination.
         """
+
         cab_fares = {}
         cabs = CabFareStructure.objects.all()
         total_distance, total_time = self.calculate_cab_distance(source, destination)
@@ -341,10 +397,14 @@ class Graph:
 
     def calculate_cab_distance(self, source, destination):
         """
-        :param source: source node
-        :param destination: destination node
-        :return: Total distance and time taken by cab to reach destination from source
+        Calculates the total distance and time taken by a cab to reach the destination from the source node.
+
+        :param source: The source node.
+        :param destination: The destination node.
+        :return: A tuple containing the total distance and time taken by the cab to reach the destination from the
+         source.
         """
+
         cab_speed = 45
         pq = [(
             0,
