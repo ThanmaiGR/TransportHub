@@ -1,6 +1,6 @@
 import os
 import datetime
-from .functions import find_path, go_from_source_to_destination, str_to_time, Graph
+from .functions import find_path, go_from_source_to_destination, str_to_time, Graph, enhance_path_info
 from django.shortcuts import render, redirect, reverse
 from .models import Locations, Routes
 from django.contrib import messages
@@ -30,7 +30,6 @@ def main(request):
         )[0][0]
         time = parse_datetime(request.POST.get('time'))
         choice = request.POST.get('Choice')
-        print('CHOICE:', choice)
         if not choice:
             choice = 'Both'
         if source == destination:
@@ -79,21 +78,7 @@ def path(request):
         del request.session['source']
         del request.session['destination']
 
-        for idx, row in enumerate(actual_path):
-            start_id, stop_id, route_id, part_time = row[0], row[1], row[2], row[4]
-            row[0] = Locations.objects.filter(LocationID=start_id).values_list(
-                'LocationName',
-                flat=True
-            ).first()
-            row[1] = Locations.objects.filter(LocationID=stop_id).values_list(
-                'LocationName',
-                flat=True
-            ).first()
-            row[2] = Routes.objects.filter(RouteID=route_id).values_list(
-                'RouteName',
-                flat=True
-            ).first()
-            row[4] = str_to_time(part_time)
+        actual_path = enhance_path_info(actual_path)
 
         context = {
             "Fare": total_fare,
@@ -101,10 +86,6 @@ def path(request):
             "Path": actual_path,
             "request": request
         }
-
-        print("Fare ", total_fare)
-        print("Time ", time_taken)
-        print("Path ", actual_path)
     else:
         del request.session['source']
         del request.session['destination']

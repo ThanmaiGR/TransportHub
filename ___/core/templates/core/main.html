@@ -7,6 +7,9 @@
         height:100vh;
         text-align: center;
     }
+    label{
+    color:black;
+    }
 </style>
 <body style="min-height: 100vh;min-width: 100vw;">
 
@@ -16,43 +19,44 @@
             <legend><strong>Find Your Transport</strong></legend>
             <form method="POST">
                 {% csrf_token %}
-                <label for="source"><b>Source</b></label>
-                <select name="source" id="source" style="display: block;" required>
+                <label for="source" style="color:black;"><b>Source</b></label>
+                <select name="source" id="source" style="display: block; color:gray" required>
                     <option value="" disabled selected hidden>Choose your Option</option>
                     {% for each in locations %}
                     <option value="{{each}}">{{each}}</option>
                     {% endfor %}
                 </select>
 
-                <label for="destination"><b>Destination</b></label>
-                <select name="destination" id="destination" style="display: block;" required>
+                <label for="destination" style="color:black;"><b>Destination</b></label>
+                <select name="destination" id="destination" style="display: block; color:gray" required>
                     <option value="" disabled selected hidden>Choose your Option</option>
 
                     {% for each in locations %}
                     <option value="{{each}}">{{each}}</option>
                     {% endfor %}
                 </select>
-                <label for="time"><b>Departure Time</b></label>
+                <label for="time" style="color:black;"><b>Departure Time</b></label>
                 <input type="datetime-local" name="time" id="time" required/>
 
                 {% if user.is_authenticated %}
                 <div>
+                    <p><b>Preferences</b></p>
                     <input type="radio" id="Fare_Preferred" name="Choice" value="Fare" style="opacity:1; pointer-events:auto; position:static">
-                    <label for="Fare_Preferred">Fare</label><br>
+                    <label for="Fare_Preferred" style="color:black;">Fare</label><br>
                     <input type="radio" id="Time_Preferred" name="Choice" value="Time" style="opacity:1; pointer-events:auto; position:static">
-                    <label for="Time_Preferred">Time</label><br>
-                    <input type="radio" id="Both_Preferred" name="Choice" value="Time" checked="checked" style="opacity:1; pointer-events:auto; position:static">
-                    <label for="Both_Preferred">Both</label><br>
+                    <label for="Time_Preferred" style="color:black;">Time</label><br>
+                    <input type="radio" id="Both_Preferred" name="Choice" value="Both" checked="checked" style="opacity:1; pointer-events:auto; position:static">
+                    <label for="Both_Preferred" style="color:black;">Both</label><br>
 
                 </div>
                 {% else %}
                 <p><b>Login to customize preferences</b></p>
                 <div>
                     <input type="radio" id="Fare_Preferred" name="Choice" value="Fare" style="opacity:1; pointer-events:auto; position:static" disabled>
-                    <label for="Fare_Preferred">Fare</label><br>
+                    <label for="Fare_Preferred" >Fare</label><br>
                     <input type="radio" id="Time_Preferred" name="Choice" value="Time" style="opacity:1; pointer-events:auto; position:static" disabled>
                     <label for="Time_Preferred">Time</label><br>
-                    <input type="radio" id="Both_Preferred" name="Choice" value="Time" checked="checked" disabled style="opacity:1; pointer-events:auto; position:static">
+                    <input type="radio" id="Both_Preferred" name="Choice" value="Both" checked="checked" disabled style="opacity:1; pointer-events:auto; position:static">
                     <label for="Both_Preferred">Both</label><br>
 
                 </div>

@@ -3,7 +3,91 @@ import datetime
 import decimal
 import heapq
 from django.db.models import F
-from .models import Locations, Connections, RouteDetails, CabCompanies, CabFareStructure
+from .models import Locations, Connections, RouteDetails, CabCompanies, CabFareStructure, Routes
+from django.db import connection
+
+
+def normalize(value_1, value_2):
+    """
+    Normalize 2 values to range [0,1]
+
+    :param value_1: The First Value
+    :param value_2: The Second Value
+    :return: Normalized Values of value_1 and value_2
+    """
+    min_val = min(value_1, value_2)
+    max_val = max(value_1, value_2)
+    if max_val != min_val:
+        normalized_first = (value_1 - min_val) / (max_val - min_val)
+        normalized_second = (value_2 - min_val) / (max_val - min_val)
+    else:
+        # If both values are the same, set normalized values to 0.5
+        normalized_first = 0.5
+        normalized_second = 0.5
+    return normalized_first, normalized_second
+
+
+def get_location_name(start_id, stop_id):
+    """
+    Retrieve the names of start and stop locations based on their IDs.
+
+    :param start_id: The ID of the start location.
+    :param stop_id: The ID of the stop location.
+    :return: A tuple containing the names of the start and stop locations
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute("CALL GetLocationName(%s, %s)", [start_id, stop_id])
+        result = cursor.fetchall()[0]
+    return result
+
+
+def get_route_name(route_id):
+    """
+    Retrieve the name of a route based on its ID.
+
+    :param route_id: The ID of the route.
+    :return: The name of the route.
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute("CALL GetRouteName(%s)", [route_id])
+        result = cursor.fetchall()[0][0]
+    return result
+
+
+def enhance_path_info(actual_path):
+    """
+    Enhances the given path with additional information.
+
+    Each row in the path is augmented with location names, route names, and vehicle types
+    retrieved from the ORM models.
+
+    :param actual_path: A list of path details in the format [start_id, stop_id, route_id, fare, time].
+    :return: The enhanced path with additional information.
+    """
+
+    for idx, row in enumerate(actual_path):
+        start_id, stop_id, route_id, time = row[0], row[1], row[2], row[4]
+        # row[0] = Locations.objects.filter(LocationID=start_id).values_list(
+        #     'LocationName',
+        #     flat=True
+        # ).first()
+        # row[1] = Locations.objects.filter(LocationID=stop_id).values_list(
+        #     'LocationName',
+        #     flat=True
+        # ).first()
+
+        row[0], row[1] = get_location_name(start_id, stop_id)
+        row[2] = get_route_name(route_id)
+        row[4] = str_to_time(time)
+        vehicle_type = Routes.objects.filter(RouteID=route_id).values_list(
+            'VehicleType',
+            flat=True
+        ).first()
+        row.insert(3, vehicle_type)
+        actual_path[idx] = row
+    return actual_path
 
 
 def str_to_time(time):
@@ -34,7 +118,6 @@ def find_path(source, destination, path):
     current_stop = destination
 
     while current_stop != source:
-        print("current_stop", current_stop)
         next_stop = path[current_stop]['from']
         route_id = path[current_stop]['by']
         fare = path[current_stop]['fare']
@@ -74,7 +157,6 @@ def go_from_source_to_destination(source, destination, path):
     route = []
 
     while current_stop is not None:
-        # print("CURR", current_stop)
         route.append(
             [
                 path[current_stop]['next_stop'],
@@ -86,7 +168,6 @@ def go_from_source_to_destination(source, destination, path):
         )
         if current_stop == destination:
             break
-        # print("HELLO", route, path[current_stop]['next_stop'], destination)
         next_stop = path[current_stop]['next_stop']
         current_stop = next_stop
     route.pop()
@@ -294,10 +375,12 @@ class Graph:
             if vehicle == 'Bus':
                 modified_time = (usual_time
                                  + (usual_time * decimal.Decimal(self.traffic[source_id][destination_id])))
-                factor = decimal.Decimal(0.8) * fare + decimal.Decimal(0.2) * modified_time
+                norm_fare, norm_time = normalize(fare, decimal.Decimal(modified_time))
+                factor = decimal.Decimal(0.8) * norm_fare + decimal.Decimal(0.2) * norm_time
                 self.cost_list[source_id][destination_id].append((route_id, fare, modified_time, factor))
             else:
-                factor = decimal.Decimal(0.8) * fare + decimal.Decimal(0.2) * usual_time
+                norm_fare, norm_time = normalize(fare, decimal.Decimal(usual_time))
+                factor = decimal.Decimal(0.2) * norm_fare + decimal.Decimal(0.8) * norm_time
                 self.cost_list[source_id][destination_id].append((route_id, fare, usual_time, factor))
 
     def calculate_best_path(self, source, destination, main_factor="Both"):
@@ -332,7 +415,6 @@ class Graph:
             current_fare, current_time, current_location_id = heapq.heappop(pq)
 
             if current_location_id == destination:
-                print("Dijkstra returned")
                 return total_fare[destination], total_time[destination], path_taken
 
             for neighbor_id, distance in self.adjacency_list[current_location_id]:
@@ -351,6 +433,7 @@ class Graph:
                         deciding_value = fare
                     else:
                         deciding_value = time_taken
+
                     new_fare = current_fare + fare
                     new_time = current_time + time_taken
                     if deciding_value < total_factor[neighbor_id]:

@@ -1,4 +1,5 @@
 {% extends 'core/header.html' %}
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -23,13 +24,20 @@
                     <th>Start Stop</th>
                     <th>Next Stop</th>
                     <th>Route</th>
+                    <th>Vehicle Type</th>
                     <th>Fare(₹)</th>
                     <th>Time</th>
                 </tr>
                 {% for tuple in Path %}
                     <tr style="background-color:#ffebbb">
                         {% for value in tuple %}
+                        {% if value == 'Bus' %}
+                            <td><img src="{% static 'images/bus.png' %}" style="width:75px;height:75px"></td>
+                        {% elif value == 'Metro' %}
+                            <td><img src="{% static 'images/metro.png' %}" style="width:75px;height:75px"></td>
+                        {% else %}
                             <td>{{value}}</td>
+                        {% endif %}
                         {% endfor %}
                     </tr>
                 {% endfor %}
@@ -54,7 +62,7 @@
             <table>
                 <tr style="background-color:#ffcab0">
                     <th>Company</th>
-                    <th>Fare</th>
+                    <th>Fare(₹)</th>
                     <th>Time</th>
                 </tr>
 

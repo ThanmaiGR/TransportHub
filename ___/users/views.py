@@ -5,6 +5,7 @@ from django.contrib import messages
 from .forms import NewUserForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.utils import OperationalError
 
 
 def register(request):
@@ -84,13 +85,6 @@ def edit(request):
         email = request.POST.get('acc_email')
         first_name = request.POST.get('acc_first')
         last_name = request.POST.get('acc_last')
-        if (first_name == '') and (last_name != ''):
-            messages.error(request, "First name cannot be blank with Last Name")
-            return render(
-                request=request,
-                template_name="users/edit.html",
-                context={}
-            )
         try:
             user = User.objects.get(email=email)
             if user is not None:
@@ -103,6 +97,11 @@ def edit(request):
                     return redirect("core:home")
                 else:
                     messages.error(request, "Email Already Exists")
+        except OperationalError as e:
+            if 'First name cannot be blank with Last Name' in str(e):
+                messages.error(request, "First name cannot be blank with Last Name")
+            else:
+                messages.error(request, "An error occurred while updating the profile.")
         except ObjectDoesNotExist:
             request.user.email = email
             request.user.first_name = first_name
