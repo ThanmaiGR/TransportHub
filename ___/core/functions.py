@@ -69,15 +69,6 @@ def enhance_path_info(actual_path):
 
     for idx, row in enumerate(actual_path):
         start_id, stop_id, route_id, time = row[0], row[1], row[2], row[4]
-        # row[0] = Locations.objects.filter(LocationID=start_id).values_list(
-        #     'LocationName',
-        #     flat=True
-        # ).first()
-        # row[1] = Locations.objects.filter(LocationID=stop_id).values_list(
-        #     'LocationName',
-        #     flat=True
-        # ).first()
-
         row[0], row[1] = get_location_name(start_id, stop_id)
         row[2] = get_route_name(route_id)
         row[4] = str_to_time(time)
@@ -229,9 +220,8 @@ def generate_traffic(current_time=None):
             base_traffic_probabilities["high"] /= 0.8
 
     # Introduce random event probability
-    random_event_probability = random.uniform(0.01, 0.1)  # 5% chance of a random event affecting traffic
+    random_event_probability = random.uniform(0.01, 0.1)
     if random.random() < random_event_probability:
-        # Adjust probabilities for random event
         random_event_type = random.choice(["protest", "accident", "road_closure"])
         if random_event_type == "protest":
             base_traffic_probabilities["high"] /= 2.1
@@ -246,10 +236,7 @@ def generate_traffic(current_time=None):
             base_traffic_probabilities["medium"] /= 1.5
             base_traffic_probabilities["low"] /= 1.2
 
-    # Generate a random number between 0 and 1
     random_number = random.random()
-
-    # Determine traffic level based on adjusted probabilities
     cumulative_probability = 0
     for level, probability in base_traffic_probabilities.items():
         cumulative_probability += probability
@@ -322,7 +309,6 @@ class Graph:
         :param time: The time at which the travel takes place.
         :return: None
         """
-
         for key, value in self.adjacency_list.items():
             for node in value:
                 traffic_factor = generate_traffic(time)
@@ -337,7 +323,6 @@ class Graph:
         :param location_id: The location_id of a location.
         :return: None
         """
-
         self.adjacency_list[location_id] = []
         self.adjacency_list[location_id].extend([
             (connection.DestinationID_id, connection.Distance)
@@ -353,7 +338,6 @@ class Graph:
         :param distance: The distance between the source and destination.
         :return: None
         """
-
         route_fares = RouteDetails.objects.filter(
             RouteID__in=RouteDetails.objects.filter(StopID=source_id).values('RouteID'),
             StopID=destination_id
@@ -372,6 +356,15 @@ class Graph:
             route_id = each_fare['RouteID']
             vehicle = each_fare['VehicleType']
             usual_time = distance / self.speed[vehicle]
+            source_stop_sequence = RouteDetails.objects.filter(RouteID=route_id, StopID=source_id).values(
+                'StopSequence')[0]['StopSequence']
+            destination_stop_sequence = RouteDetails.objects.filter(RouteID=route_id, StopID=destination_id).values(
+                'StopSequence')[0]['StopSequence']
+            total_stops = RouteDetails.objects.filter(RouteID=route_id).count()
+
+            if ((destination_stop_sequence - source_stop_sequence) == 1
+                    or (destination_stop_sequence - source_stop_sequence) == total_stops - 1):
+                continue
             if vehicle == 'Bus':
                 modified_time = (usual_time
                                  + (usual_time * decimal.Decimal(self.traffic[source_id][destination_id])))
@@ -382,6 +375,9 @@ class Graph:
                 norm_fare, norm_time = normalize(fare, decimal.Decimal(usual_time))
                 factor = decimal.Decimal(0.2) * norm_fare + decimal.Decimal(0.8) * norm_time
                 self.cost_list[source_id][destination_id].append((route_id, fare, usual_time, factor))
+        else:
+            if not len(self.cost_list[source_id][destination_id]):
+                del self.cost_list[source_id][destination_id]
 
     def calculate_best_path(self, source, destination, main_factor="Both"):
         """
@@ -392,7 +388,6 @@ class Graph:
         :param main_factor: The factor to use for calculation, such as fare, time, or a combination of both.
         :return: A tuple containing the total fare, total time, and the path between the source and destination nodes.
         """
-
         factors = {
             "Fare": 1,
             "Time": 2,
@@ -402,8 +397,10 @@ class Graph:
             other_factor = "Fare"
         else:
             other_factor = "Both"
-        pq = [(0, 0,
-               source)]  # The first element is the total fare, the second is the total time and third is location_id
+        pq = [
+            (0, 0, 0, source)
+        ]  # The first element is the total factor, the second is the total time,
+        # the third is total fare and the fourth is location_id
         path_taken = {}
         total_fare = {location_id: float('inf') for location_id in self.adjacency_list}
         total_time = {location_id: float('inf') for location_id in self.adjacency_list}
@@ -412,13 +409,17 @@ class Graph:
         total_fare[source] = 0
         total_time[source] = 0
         while pq:
-            current_fare, current_time, current_location_id = heapq.heappop(pq)
-
+            current_factor, current_time, current_fare, current_location_id = heapq.heappop(pq)
             if current_location_id == destination:
                 return total_fare[destination], total_time[destination], path_taken
 
             for neighbor_id, distance in self.adjacency_list[current_location_id]:
-                if neighbor_id in path_taken:
+                flag = False
+                for node, info in path_taken.items():
+                    if info['from'] == neighbor_id:
+                        flag = True
+                        break
+                if flag:
                     continue
                 if (current_location_id in self.cost_list
                         and neighbor_id in self.cost_list[current_location_id]):
@@ -436,11 +437,12 @@ class Graph:
 
                     new_fare = current_fare + fare
                     new_time = current_time + time_taken
+                    new_factor = current_factor + deciding_value
                     if deciding_value < total_factor[neighbor_id]:
                         total_fare[neighbor_id] = new_fare
                         total_time[neighbor_id] = new_time
                         total_factor[neighbor_id] = deciding_value
-                        heapq.heappush(pq, (new_fare, new_time, neighbor_id))
+                        heapq.heappush(pq, (new_factor, new_time, new_fare, neighbor_id))
                         path_taken[neighbor_id] = ({
                             'from': current_location_id,
                             'by': route_id,
@@ -458,7 +460,6 @@ class Graph:
         :return: A dictionary containing the total fare and time taken by each cab to go from the source to the
         destination.
         """
-
         cab_fares = {}
         cabs = CabFareStructure.objects.all()
         total_distance, total_time = self.calculate_cab_distance(source, destination)
@@ -487,7 +488,6 @@ class Graph:
         :return: A tuple containing the total distance and time taken by the cab to reach the destination from the
          source.
         """
-
         cab_speed = 45
         pq = [(
             0,
@@ -507,7 +507,7 @@ class Graph:
             for neighbor_id, distance in self.adjacency_list[current_location_id]:
                 time_factor = decimal.Decimal(self.traffic[current_location_id][neighbor_id])
                 usual_time = distance / cab_speed
-                time_taken = usual_time + (time_factor*usual_time)
+                time_taken = usual_time + (time_factor * usual_time)
                 new_distance = current_distance + distance
                 new_time = current_time + time_taken
                 if new_distance < total_distance[neighbor_id]:
