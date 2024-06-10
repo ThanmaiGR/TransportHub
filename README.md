@@ -37,9 +37,6 @@ Installation
    Open your web browser and go to http://127.0.0.1:8000/
 
 
-Home Page
-
-
 Transport Variations based on chosen feature
 1) Fare
    ![image](https://github.com/ThanmaiGR/TransportHub/assets/118910787/792895a3-58d3-404a-8b11-ee70763c20e0)
