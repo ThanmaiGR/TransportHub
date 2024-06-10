@@ -1,0 +1,5 @@
+django
+mysqlclient
+numpy
+pyautogui
+opency-python
