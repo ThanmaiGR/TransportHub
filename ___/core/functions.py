@@ -37,7 +37,7 @@ def get_location_name(start_id, stop_id):
     """
 
     with connection.cursor() as cursor:
-        cursor.execute("CALL GetLocationName(%s, %s)", [start_id, stop_id])
+        cursor.execute("CALL GetLocationNames(%s, %s)", [start_id, stop_id])
         result = cursor.fetchall()[0]
     return result
 

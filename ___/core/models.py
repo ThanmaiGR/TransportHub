@@ -84,22 +84,3 @@ class RouteDetails(BaseModel):
     class Meta:
         unique_together = ('RouteID', 'StopSequence')
         verbose_name_plural = 'Route Details'
-
-
-# class Schedules(BaseModel):
-#     ScheduleID = models.AutoField(primary_key=True)
-#     RouteID = models.ForeignKey(Routes, on_delete=models.CASCADE, db_column="RouteID")
-#     DepartureTime = models.TimeField()
-
-
-# class CabBookings(BaseModel):
-#     BookingID = models.AutoField(primary_key=True)
-#     UserID = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-#     CompanyID = models.ForeignKey(CabCompanies, on_delete=models.CASCADE, )
-#     SourceLocationID = models.ForeignKey(Locations, on_delete=models.CASCADE, related_name='source_location')
-#     DestinationLocationID = models.ForeignKey(Locations, on_delete=models.CASCADE,
-#     related_name='destination_location')
-#     BookingTime = models.DateTimeField()
-#
-#     def __str__(self):
-#         return f"Booking {self.BookingID} - {self.UserID}"
