@@ -21,8 +21,17 @@ Installation
 4) Apply migrations:
    python manage.py migrate
 
-5) Run the development server:
+5) Import Sql file into your mysql server
+    MySQL WorkBench 
+    i) Under Server Administration on the Home window select the server instance you want to restore database to (Create New Server Instance if doing it first time).
+    ii) Click on Manage Import/Export
+    iii) Click on Data Import/Restore on the left side of the screen.
+    iv) Select Import from Self-Contained File radio button (right side of screen)
+    v) Select the path of .sql
+    vi) Click Start Import button at the right bottom corner of window.
+
+6) Run the development server:
    python manage.py runserver
 
-6) Access the application:
+7) Access the application:
    Open your web browser and go to http://127.0.0.1:8000/
