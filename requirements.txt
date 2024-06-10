@@ -2,4 +2,4 @@ django
 mysqlclient
 numpy
 pyautogui
-opency-python
+opencv-python
